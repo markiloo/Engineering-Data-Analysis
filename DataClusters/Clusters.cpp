@@ -11,6 +11,7 @@ double GenerateGaussianRand(default_random_engine &arg_generator);
 double getDouble(string message);
 int getInt(string message);
 int generateInt(int min, int max);
+char getChar(string message);
 
 class Cluster 
 {
@@ -71,10 +72,16 @@ class Cluster
 
 };
 
+void PlayGame();
+
+void GenerateData(int totalOcurr, default_random_engine &generator, int cumulativeFrequency, vector<Cluster> &arg_dataClusters);
+
 int main()
 {
   const int totalOccurences = 5000;
   double cumulativeFrequency = 0;
+  char userInput = 'a';
+
   default_random_engine generator((unsigned) time(nullptr));
   srand((unsigned) time(nullptr));
 
@@ -124,43 +131,20 @@ int main()
 
   }
 
-  int occurencesGenerated = 0;
+  userInput = getChar("Enter G to generate data\nEnter P to play game\nInput: ");
 
-  while(occurencesGenerated < totalOccurences)
+  if (userInput == 'G')
   {
-    double totalFreq = 0;
-    int randomNumber = generateInt(0, cumulativeFrequency);
-
-    for(int i = 0; i < dataClusters.size(); i++)
-    {
-      if (randomNumber < totalFreq + dataClusters[i].GetRelativeFrequency())
-      {
-        dataClusters[i].SetxCoord(GenerateGaussianRand(generator));
-        dataClusters[i].SetyCoord(GenerateGaussianRand(generator));
-        occurencesGenerated = occurencesGenerated + 1;
-        break;
-      }
-      totalFreq += dataClusters[i].GetRelativeFrequency();
-    }
+    GenerateData((int)totalOccurences, generator, cumulativeFrequency, dataClusters);
   }
-
-  ofstream file;
-
-  file.open("Data.txt");
+  else if (userInput == 'P')
+  {
+    PlayGame();
+  }
   
-  for(int i = 0; i < totalOccurences; i++)
-  {
-    for(int j = 0; j < dataClusters.size(); j++)
-    {
-      if(i < dataClusters[j].xCoord.size())
-      {
-        file << dataClusters[j].xCoord[i] << "," << dataClusters[j].yCoord[i] << "," << dataClusters[j].getName() << "," << " \t";
-      }
-    }
-    file << "\n";
-  }
 
-  file.close();
+
+
 
   return 0;
 }
@@ -226,4 +210,73 @@ int getInt(string message)
   cin.ignore(INT_MAX, '\n');
 
   return userInput;
+}
+
+char getChar(string message)
+{
+  char userInput;
+
+  do 
+  {
+    if(cin.good() == false)
+    {
+      cin.clear();
+      cin.ignore(INT_MAX, '\n');
+    }
+
+    cout << message;
+    cin >> userInput;
+
+  } while(cin.good() == false);
+
+  cin.ignore(INT_MAX, '\n');
+
+  return userInput;
+}
+
+void GenerateData(int totalOcurr, default_random_engine &generator, int cumulativeFrequency, vector<Cluster> &arg_dataClusters)
+{
+  int occurencesGenerated = 0;
+
+  while(occurencesGenerated < totalOcurr)
+  {
+    double totalFreq = 0;
+    int randomNumber = generateInt(0, cumulativeFrequency);
+
+    for(int i = 0; i < arg_dataClusters.size(); i++)
+    {
+      if (randomNumber < totalFreq + arg_dataClusters[i].GetRelativeFrequency())
+      {
+        arg_dataClusters[i].SetxCoord(GenerateGaussianRand(generator));
+        arg_dataClusters[i].SetyCoord(GenerateGaussianRand(generator));
+        occurencesGenerated = occurencesGenerated + 1;
+        break;
+      }
+      totalFreq += arg_dataClusters[i].GetRelativeFrequency();
+    }
+  }
+
+  ofstream file;
+
+  file.open("Data.text");
+  
+  for(int i = 0; i < totalOcurr; i++)
+  {
+    for(int j = 0; j < arg_dataClusters.size(); j++)
+    {
+      if(i < arg_dataClusters[j].xCoord.size())
+      {
+        file << arg_dataClusters[j].xCoord[i] << "," << arg_dataClusters[j].yCoord[i] << "," << arg_dataClusters[j].getName() << "," << " \t";
+      }
+    }
+    file << "\n";
+  }
+
+  file.close();
+
+}
+
+void PlayGame()
+{
+  cout << "Hello World!" << endl;
 }
