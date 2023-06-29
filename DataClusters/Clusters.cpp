@@ -3,12 +3,14 @@
 #include <fstream>
 #include <cstdlib>
 #include <vector>
+#include <iomanip>
 
 using namespace std;
 
 double GenerateGaussianRand(default_random_engine &arg_generator); 
 double getDouble(string message);
 int getInt(string message);
+int generateInt(int min, int max);
 
 class Cluster 
 {
@@ -47,6 +49,21 @@ class Cluster
       return relativeFrequency;
     }
 
+    double GetStandardDeviation()
+    {
+      return standardDeviation;
+    }
+
+    double GetXMean()
+    {
+      return xCoordMean;
+    }
+
+    double GetYMean()
+    {
+      return yCoordMean;
+    }
+
     char getName()
     {
       return clusterName;
@@ -59,6 +76,7 @@ int main()
   const int totalOccurences = 5000;
   double cumulativeFrequency = 0;
   default_random_engine generator((unsigned) time(nullptr));
+  srand((unsigned) time(nullptr));
 
   int numberOfClusters = getInt("Enter number of Types: ");
   while (numberOfClusters <= 0)
@@ -68,7 +86,8 @@ int main()
   }
 
   cout << endl;
-  //generating array for clusters
+
+  //generating vector for clusters
   vector<Cluster> dataClusters;
 
   for(int i = 0; i < numberOfClusters; i++)
@@ -105,34 +124,43 @@ int main()
 
   }
 
-  for(Cluster data: dataClusters)
+  int occurencesGenerated = 0;
+
+  while(occurencesGenerated < totalOccurences)
   {
-    for(int i = 0; i < (data.GetRelativeFrequency()/cumulativeFrequency) * totalOccurences; i++)
+    double totalFreq = 0;
+    int randomNumber = generateInt(0, cumulativeFrequency);
+
+    for(int i = 0; i < dataClusters.size(); i++)
     {
-      data.SetxCoord(GenerateGaussianRand(generator));
-      data.SetyCoord(GenerateGaussianRand(generator));
+      if (randomNumber < totalFreq + dataClusters[i].GetRelativeFrequency())
+      {
+        dataClusters[i].SetxCoord(GenerateGaussianRand(generator));
+        dataClusters[i].SetyCoord(GenerateGaussianRand(generator));
+        occurencesGenerated = occurencesGenerated + 1;
+        break;
+      }
+      totalFreq += dataClusters[i].GetRelativeFrequency();
     }
   }
 
   ofstream file;
 
   file.open("Data.txt");
-
+  
   for(int i = 0; i < totalOccurences; i++)
   {
-    for(int j = 0; j < dataClusters.size(); i++)
+    for(int j = 0; j < dataClusters.size(); j++)
     {
-      if(j < dataClusters[j].xCoord.size())
+      if(i < dataClusters[j].xCoord.size())
       {
-        file << dataClusters[j].xCoord[i] << "," << dataClusters[j].yCoord[i] << dataClusters[j].getName() << " \t";
+        file << dataClusters[j].xCoord[i] << "," << dataClusters[j].yCoord[i] << "," << dataClusters[j].getName() << "," << " \t";
       }
     }
-    cout << endl;
+    file << "\n";
   }
 
-
-
-
+  file.close();
 
   return 0;
 }
@@ -143,6 +171,18 @@ double GenerateGaussianRand(default_random_engine &arg_generator)
 
   return distribution(arg_generator);
 }
+
+int generateInt(int min, int max) 
+{
+  int number = rand();
+  while(number < min || number > max)
+  {
+    number = rand();
+  }
+
+  return number;
+}
+
 
 double getDouble(string message) 
 {
