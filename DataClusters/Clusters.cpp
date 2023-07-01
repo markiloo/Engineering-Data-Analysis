@@ -295,7 +295,7 @@ void GenerateData(int totalOcurr,
         file << arg_dataClusters[j].xCoord[i] << "," 
                 << arg_dataClusters[j].yCoord[i] 
                 << "," << arg_dataClusters[j].getName()
-                << "," << " \t";
+                << ",";
       }
     }
     file << "\n";
