@@ -315,7 +315,7 @@ void PlayGame(default_random_engine &generator,
 
   cout << endl;
 
-  cout << "Guess the type! - Type [ to exit" << endl;
+  cout << "Guess the type!" << endl;
 
   while (isGameOver == false)
   {
@@ -335,22 +335,44 @@ void PlayGame(default_random_engine &generator,
       totalFreq += arg_dataClusters[i].GetRelativeFrequency();
     }
 
+    char *choices = new char[arg_dataClusters.size()];
+
     cout << "Your Type Choices are ";
 
     for(int i = 0; i < arg_dataClusters.size(); i++)
+    {
       cout << arg_dataClusters[i].getName() << ",";
+      choices[i] = arg_dataClusters[i].getName();
+    }
+
     cout << endl;
+
+    cout << "Type 1 to Exit" << endl;
 
     char answer = getChar("Enter Type: ");
     if(answer >= 'a' && answer <= 'z') 
     {
       answer = answer - 32;
     }
-    else if (answer < 'A' || answer > '[')
+    else if (answer == '1')
     {
-      while (answer < 'A' || answer > '[')
+      isGameOver = true;
+      break;
+    }
+    else if (answer < 'A' || answer > 'Z')
+    {
+      while (answer < 'A' || answer > 'Z')
       {
         answer = getChar("Enter Type: ");
+        if(answer == '1')
+        {
+          isGameOver = true;
+          break;
+        }
+      }
+      if(isGameOver == true)
+      {
+        break;
       }
     }
 
@@ -358,16 +380,10 @@ void PlayGame(default_random_engine &generator,
     {
       correctAnswers += 1;
     }
-    else if (answer == '[')
-    {
-      isGameOver = true;
-      break;
-    }
 
     totalQuestions += 1;
     cout << endl;
-    cout << correctAnswers << "/" << totalQuestions << " - " << (correctAnswers/(double) totalQuestions) * 100 << endl;
+    cout << "Score: " << correctAnswers << "/" << totalQuestions << " - " << round((correctAnswers/(double) totalQuestions) * 100) << "%" << endl;
 
-  }
-  
+  } 
 }
