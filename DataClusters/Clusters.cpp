@@ -15,12 +15,6 @@
 
 using namespace std;
 
-double GenerateGaussianRand(default_random_engine &arg_generator); 
-double getDouble(string message);
-int getInt(string message);
-int generateInt(int min, int max);
-char getChar(string message);
-
 class Cluster 
 {
   private:
@@ -81,6 +75,12 @@ class Cluster
     }
 
 };
+
+double GenerateGaussianRand(default_random_engine &arg_generator); 
+double getDouble(string message);
+int getInt(string message);
+int generateInt(int min, int max);
+char getChar(string message);
 
 void PlayGame(default_random_engine &generator, 
               vector<Cluster> &arg_dataClusters, 
@@ -378,7 +378,12 @@ void PlayGame(default_random_engine &generator,
 
     if(answer == generatedType)
     {
+      cout << "Correct!" << endl;
       correctAnswers += 1;
+    }
+    else 
+    {
+      cout << "Wrong!" << endl;
     }
 
     totalQuestions += 1;
