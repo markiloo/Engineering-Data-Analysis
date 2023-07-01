@@ -284,7 +284,7 @@ void GenerateData(int totalOcurr,
 
   ofstream file;
 
-  file.open("Data.text");
+  file.open("Data.txt");
   
   for(int i = 0; i < totalOcurr; i++)
   {
