@@ -79,17 +79,16 @@ class Cluster
 double GenerateGaussianRand(default_random_engine &arg_generator); 
 double getDouble(string message);
 int getInt(string message);
-int generateInt(int min, int max);
+int generateDecimal(double min, double max, default_random_engine &arg_generator);
 char getChar(string message);
 
 void PlayGame(default_random_engine &generator, 
               vector<Cluster> &arg_dataClusters, 
-              int cumulativeFrequency);
+              double cumulativeFrequency);
 void GenerateData(int totalOcurr, 
                   default_random_engine &generator,
-                  int cumulativeFrequency, 
+                  double cumulativeFrequency, 
                   vector<Cluster> &arg_dataClusters);
-
 
 
 int main()
@@ -98,7 +97,6 @@ int main()
   double cumulativeFrequency = 0;
 
   default_random_engine generator((unsigned) time(nullptr));
-  srand((unsigned) time(nullptr));
 
   int numberOfClusters = getInt("Enter number of Types: ");
   while (numberOfClusters <= 0)
@@ -172,7 +170,6 @@ int main()
 }
 
 
-
 double GenerateGaussianRand(default_random_engine &arg_generator) 
 {
   normal_distribution<double> distribution(0, 1);
@@ -180,15 +177,11 @@ double GenerateGaussianRand(default_random_engine &arg_generator)
   return distribution(arg_generator);
 }
 
-int generateInt(int min, int max) 
+int generateNumber(double min, double max, default_random_engine &arg_generator) 
 {
-  int number = rand();
-  while(number < min || number > max)
-  {
-    number = rand();
-  }
+  uniform_real_distribution<double> distribution(min, max);
 
-  return number;
+  return distribution(arg_generator);
 }
 
 double getDouble(string message) 
@@ -259,7 +252,7 @@ char getChar(string message)
 
 void GenerateData(int totalOcurr, 
                   default_random_engine &generator,
-                  int cumulativeFrequency, 
+                  double cumulativeFrequency, 
                   vector<Cluster> &arg_dataClusters)
 {
   int occurencesGenerated = 0;
@@ -267,7 +260,7 @@ void GenerateData(int totalOcurr,
   while(occurencesGenerated < totalOcurr)
   {
     double totalFreq = 0;
-    int randomNumber = generateInt(0, cumulativeFrequency);
+    int randomNumber = generateNumber(0, cumulativeFrequency, generator);
 
     for(int i = 0; i < arg_dataClusters.size(); i++)
     {
@@ -292,10 +285,11 @@ void GenerateData(int totalOcurr,
     {
       if(i < arg_dataClusters[j].xCoord.size())
       {
-        file << arg_dataClusters[j].xCoord[i] << "," 
+        string delimeter = " \t";
+        file << arg_dataClusters[j].xCoord[i] << delimeter
                 << arg_dataClusters[j].yCoord[i] 
-                << "," << arg_dataClusters[j].getName()
-                << ",";
+                << delimeter << arg_dataClusters[j].getName()
+                << delimeter;
       }
     }
     file << "\n";
@@ -307,7 +301,7 @@ void GenerateData(int totalOcurr,
 
 void PlayGame(default_random_engine &generator,  
               vector<Cluster> &arg_dataClusters, 
-              int cumulativeFrequency)
+              double cumulativeFrequency)
 {
   bool isGameOver = false;
   int correctAnswers = 0;
@@ -321,7 +315,7 @@ void PlayGame(default_random_engine &generator,
   {
     double totalFreq = 0;
     char generatedType;
-    int randomNumber = generateInt(0, cumulativeFrequency);
+    int randomNumber = generateNumber(0, cumulativeFrequency, generator);
 
     for(int i = 0; i < arg_dataClusters.size(); i++)
     {
