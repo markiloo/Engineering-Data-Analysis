@@ -316,6 +316,7 @@ void PlayGame(default_random_engine &generator,
     double totalFreq = 0;
     char generatedType;
     int randomNumber = generateNumber(0, cumulativeFrequency, generator);
+    char choiceBound = arg_dataClusters[arg_dataClusters.size() - 1].getName();
 
     for(int i = 0; i < arg_dataClusters.size(); i++)
     {
@@ -329,14 +330,11 @@ void PlayGame(default_random_engine &generator,
       totalFreq += arg_dataClusters[i].GetRelativeFrequency();
     }
 
-    char *choices = new char[arg_dataClusters.size()];
-
     cout << "Your Type Choices are ";
 
     for(int i = 0; i < arg_dataClusters.size(); i++)
     {
       cout << arg_dataClusters[i].getName() << ",";
-      choices[i] = arg_dataClusters[i].getName();
     }
 
     cout << endl;
@@ -353,15 +351,20 @@ void PlayGame(default_random_engine &generator,
       isGameOver = true;
       break;
     }
-    else if (answer < 'A' || answer > 'Z')
+    if (answer < 'A' || answer > choiceBound)
     {
-      while (answer < 'A' || answer > 'Z')
+      while (answer < 'A' || answer > choiceBound)
       {
+        cout << "Not a valid choice!" << endl;
         answer = getChar("Enter Type: ");
         if(answer == '1')
         {
           isGameOver = true;
           break;
+        }
+        else if(answer >= 'a' && answer <= 'z') 
+        {
+          answer = answer - 32;
         }
       }
       if(isGameOver == true)
@@ -372,12 +375,12 @@ void PlayGame(default_random_engine &generator,
 
     if(answer == generatedType)
     {
-      cout << "Correct!" << endl;
+      cout << "\nCorrect!" << endl;
       correctAnswers += 1;
     }
     else 
     {
-      cout << "Wrong!" << endl;
+      cout << "\nWrong! - The correct type is: " << generatedType << endl;
     }
 
     totalQuestions += 1;
