@@ -15,6 +15,7 @@
 
 using namespace std;
 
+//cluster class holding the data of the clusters
 class Cluster 
 {
   private:
@@ -28,7 +29,8 @@ class Cluster
     vector<double> xCoord;
     vector<double> yCoord;
 
-    Cluster(double arg_standardDeviation, double arg_relativeFrequency, 
+    Cluster(double arg_standardDeviation, 
+            double arg_relativeFrequency, 
             double arg_xCoordMean, double arg_yCoordMean, 
             char arg_clusterName)
     {
@@ -39,14 +41,18 @@ class Cluster
       clusterName = arg_clusterName;
     }
 
-    void SetxCoord(double arg_value)
+    double SetxCoord(double arg_value)
     {
-      xCoord.push_back(arg_value*standardDeviation + xCoordMean);
+      double value = arg_value*standardDeviation + xCoordMean;
+      xCoord.push_back(value);
+      return value;
     }
 
-    void SetyCoord(double arg_value)
+    double SetyCoord(double arg_value)
     {
-      yCoord.push_back(arg_value*standardDeviation + yCoordMean);
+      double value = arg_value*standardDeviation + yCoordMean;
+      yCoord.push_back(value);
+      return value;
     }
 
     double GetRelativeFrequency()
@@ -79,7 +85,7 @@ class Cluster
 double GenerateGaussianRand(default_random_engine &arg_generator); 
 double getDouble(string message);
 int getInt(string message);
-int generateDecimal(double min, double max, default_random_engine &arg_generator);
+                    
 char getChar(string message);
 
 void PlayGame(default_random_engine &generator, 
@@ -90,14 +96,21 @@ void GenerateData(int totalOcurr,
                   double cumulativeFrequency, 
                   vector<Cluster> &arg_dataClusters);
 
+int generateDecimal(double min, 
+                    double max, 
+                    default_random_engine &arg_generator);
 
 int main()
 {
-  const int totalOccurences = 5000;
+  int totalOccurences;
   double cumulativeFrequency = 0;
 
+  //initializing generator with seed
   default_random_engine generator((unsigned) time(nullptr));
 
+  cout << "Note: When input is null. The program waits until input is entered" << endl;
+
+  //getting number of types
   int numberOfClusters = getInt("Enter number of Types: ");
   while (numberOfClusters <= 0)
   {
@@ -110,6 +123,7 @@ int main()
   //generating vector for clusters
   vector<Cluster> dataClusters;
 
+  //getting setting of the clusters
   for(int i = 0; i < numberOfClusters; i++)
   {
 
@@ -120,20 +134,21 @@ int main()
     double xMean = getDouble("Enter Parameter 1 Mean: ");
     double yMean = getDouble("Enter Paramter 2 Mean: ");
 
+    double standardDeviation = getDouble("Enter Standard Deviation: ");
+
+    while (standardDeviation <= 0)
+    {
+    cout << "Valid input is a positive number" << endl;
+    standardDeviation = getDouble("Enter Standard Deviation: ");
+    }
+
+
     double relativeFrequency = getDouble("Enter Relative Frequency: ");
     
     while (relativeFrequency <= 0)
     {
     cout << "Valid input is a positive number" << endl;
     relativeFrequency = getDouble("Enter Relative Frequency: ");
-    }
-
-    double standardDeviation = getDouble("Enter Standard Deviation: ");
-
-    while (standardDeviation <= 0)
-    {
-    cout << "Valid input is a positive number" << endl;
-    standardDeviation = getDouble("Enter Relative Frequency: ");
     }
 
     cout << "------------------------------" << endl;
@@ -146,6 +161,7 @@ int main()
 
   }
 
+  //getting the mode that the program will be run at
   char userInput = 'a';
   while(userInput != 'G' && userInput != 'P' && userInput != 'g' && userInput != 'p')
   {
@@ -153,15 +169,30 @@ int main()
 
     if (userInput == 'G' || userInput == 'g')
     {
+      totalOccurences = getInt("Enter number of Occurences: ");
+
+      while (totalOccurences <= 0)
+      {
+        cout << "Valid input is a positive counting number!" << endl;
+        totalOccurences = getInt("Enter number of Occurences: ");
+      }
+
       GenerateData((int)totalOccurences,
                   generator,
                   cumulativeFrequency, 
                   dataClusters);
     }
+
     else if (userInput == 'P' || userInput == 'p')
     {
       PlayGame(generator, dataClusters, cumulativeFrequency);
     }
+
+    else
+    {
+      cout << "Invalid input!" << endl;
+    }
+
   }
 
   cout << "Program Ended!" << endl;
@@ -170,6 +201,7 @@ int main()
 }
 
 
+//function to generate gaussian rand
 double GenerateGaussianRand(default_random_engine &arg_generator) 
 {
   normal_distribution<double> distribution(0, 1);
@@ -177,13 +209,16 @@ double GenerateGaussianRand(default_random_engine &arg_generator)
   return distribution(arg_generator);
 }
 
-int generateNumber(double min, double max, default_random_engine &arg_generator) 
+//function to generate a random number
+int generateNumber(double min, double max, 
+                  default_random_engine &arg_generator) 
 {
   uniform_real_distribution<double> distribution(min, max);
 
   return distribution(arg_generator);
 }
 
+//function to get a double
 double getDouble(string message) 
 {
   double userInput = 0;
@@ -192,6 +227,7 @@ double getDouble(string message)
   {
     if(cin.good() == false)
     {
+      cout << "Wrong input. Please enter a number\n";
       cin.clear();
       cin.ignore(INT_MAX, '\n');
     }
@@ -206,14 +242,16 @@ double getDouble(string message)
   return userInput;
 }
 
+//function to get an int
 int getInt(string message) 
 {
-  int userInput = 0;
+  double userInput = 0;
 
   do 
   {
-    if(cin.good() == false)
+    if(cin.good() == false || userInput != (int) userInput)
     {
+      cout << "Wrong input. Please enter an integer\n";
       cin.clear();
       cin.ignore(INT_MAX, '\n');
     }
@@ -221,13 +259,14 @@ int getInt(string message)
     cout << message;
     cin >> userInput;
 
-  } while(cin.good() == false);
+  } while(cin.good() == false || userInput != (int) userInput);
 
   cin.ignore(INT_MAX, '\n');
 
-  return userInput;
+  return (int) userInput;
 }
 
+//function to get a character
 char getChar(string message)
 {
   char userInput;
@@ -236,6 +275,7 @@ char getChar(string message)
   {
     if(cin.good() == false)
     {
+      cout << "Wrong input. Please enter a character\n";
       cin.clear();
       cin.ignore(INT_MAX, '\n');
     }
@@ -255,7 +295,12 @@ void GenerateData(int totalOcurr,
                   double cumulativeFrequency, 
                   vector<Cluster> &arg_dataClusters)
 {
+
+  ofstream file;
+  file.open("Data.txt");
+
   int occurencesGenerated = 0;
+  string delimeter = " \t";
 
   while(occurencesGenerated < totalOcurr)
   {
@@ -266,8 +311,12 @@ void GenerateData(int totalOcurr,
     {
       if (randomNumber < totalFreq + arg_dataClusters[i].GetRelativeFrequency())
       {
-        arg_dataClusters[i].SetxCoord(GenerateGaussianRand(generator));
-        arg_dataClusters[i].SetyCoord(GenerateGaussianRand(generator));
+        file << arg_dataClusters[i].SetxCoord(GenerateGaussianRand(generator));
+        file << delimeter;
+        file << arg_dataClusters[i].SetyCoord(GenerateGaussianRand(generator));
+        file << delimeter;
+        file << arg_dataClusters[i].getName();
+        file << endl; 
         occurencesGenerated = occurencesGenerated + 1;
         break;
       }
@@ -275,26 +324,7 @@ void GenerateData(int totalOcurr,
     }
   }
 
-  ofstream file;
-
-  file.open("Data.txt");
-  
-  for(int i = 0; i < totalOcurr; i++)
-  {
-    for(int j = 0; j < arg_dataClusters.size(); j++)
-    {
-      if(i < arg_dataClusters[j].xCoord.size())
-      {
-        string delimeter = " \t";
-        file << arg_dataClusters[j].xCoord[i] << delimeter
-                << arg_dataClusters[j].yCoord[i] 
-                << delimeter << arg_dataClusters[j].getName()
-                << delimeter;
-      }
-    }
-    file << "\n";
-  }
-
+  file << "\n By Marc Adrian D. Ignacio";
   file.close();
 
 }
@@ -322,8 +352,12 @@ void PlayGame(default_random_engine &generator,
     {
       if (randomNumber <= totalFreq + arg_dataClusters[i].GetRelativeFrequency())
       {
-        cout << "Parameter 1: " << GenerateGaussianRand(generator)*arg_dataClusters[i].GetStandardDeviation() + arg_dataClusters[i].GetXMean() << endl;
-        cout << "Parameter 2: " << GenerateGaussianRand(generator)*arg_dataClusters[i].GetStandardDeviation() + arg_dataClusters[i].GetYMean() << endl;
+        cout << "Parameter 1: " 
+              << GenerateGaussianRand(generator)*arg_dataClusters[i].GetStandardDeviation() + arg_dataClusters[i].GetXMean()
+              << endl;
+        cout << "Parameter 2: " 
+              << GenerateGaussianRand(generator)*arg_dataClusters[i].GetStandardDeviation() + arg_dataClusters[i].GetYMean() 
+              << endl;
         generatedType = arg_dataClusters[i].getName();
         break;
       }
@@ -380,12 +414,19 @@ void PlayGame(default_random_engine &generator,
     }
     else 
     {
-      cout << "\nWrong! - The correct type is: " << generatedType << endl;
+      cout << "\nWrong! - The correct type is: " 
+            << generatedType 
+            << endl;
     }
 
     totalQuestions += 1;
     cout << endl;
-    cout << "Score: " << correctAnswers << "/" << totalQuestions << " - " << round((correctAnswers/(double) totalQuestions) * 100) << "%" << endl;
+    cout << "Score: " 
+          << correctAnswers 
+          << "/" << totalQuestions 
+          << " - " 
+          << round((correctAnswers/(double) totalQuestions) * 100) 
+          << "%" << endl;
 
   } 
 }

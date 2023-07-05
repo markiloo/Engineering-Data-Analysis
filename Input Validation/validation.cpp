@@ -1,35 +1,55 @@
 #include <iostream>
+#include <sstream>
 
 using namespace std;
 
-int getInt(string message);
+string GetString(string message);
+int GetInt(string message);
 
 int main()
 {
 
-  int input = getInt("Enter a number:");
+  cout << GetInt("Enter message: ");
 
   return 0;
 }
 
-int getInt(string message) 
+string GetString(string message) 
 {
-  int userInput = 0;
+  string userInput;
+  cout << message;
 
-  do 
-  {
-    if(cin.good() == false)
-    {
-      cin.clear();
-      cin.ignore(INT_MAX, '\n');
-    }
-
-    cout << message;
-    cin >> userInput;
-
-  } while(cin.good() == false);
-
-  cin.ignore(INT_MAX, '\n');
+  getline(cin, userInput);
 
   return userInput;
+}
+
+int GetInt(string message)
+{
+  bool isInputValid = false;
+  string word;
+
+  while(isInputValid == false)
+  {
+    stringstream stream(GetString(message));
+
+    int length = 0;
+    while(stream >> word)
+    {
+      if (length > 1)
+      {
+        cout << "Invalid input. Please enter a number." << endl;
+        break;
+      }
+      length++;
+    }
+
+    if(length == 1)
+    {
+      isInputValid = true;
+    }
+
+  }
+
+  return stoi(word);
 }
