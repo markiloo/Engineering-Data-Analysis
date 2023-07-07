@@ -3,6 +3,7 @@
 #include <fstream>
 #include <vector>
 #include <sstream>
+#include <iomanip>
 
 /*
   LeastSquares line fit calculator
@@ -13,17 +14,142 @@
 
 using namespace std;
 
-class Data
+class LineFit
 {
   private:
     string file_adress;
+    double slope;
+    double Y_intercept;
+    double sum_of_x = 0;
+    double sum_of_x_squared = 0;
+    double sum_of_y = 0;
+    double sum_of_x_times_y = 0;
+    double n = 0;
+
+    vector<double> X_coordinates;
+    vector<double> Y_coordinates;
+
+    void ComputeSlope()
+    {
+      double numerator;
+      double denominator;
+
+      numerator = n*sum_of_x_times_y - (sum_of_x * sum_of_y);
+      denominator = n*sum_of_x_squared - sum_of_x * sum_of_x;
+
+      slope = numerator/denominator;
+    }
+
+    void ComputeIntercept()
+    {
+      double numerator;
+      double denominator;
+
+      numerator = sum_of_y - slope*sum_of_x;
+      denominator = n;
+
+      Y_intercept = numerator/denominator;
+    }
+
+    void ComputeSums()
+    {
+      n = X_coordinates.size();
+
+      for(int i = 0; i < X_coordinates.size(); i++)
+      {
+        double x = X_coordinates[i];
+        double y = Y_coordinates[i];
+    
+        sum_of_x = sum_of_x + x;
+        sum_of_x_squared = sum_of_x_squared + (x*x);
+        sum_of_y = sum_of_y + y;
+        sum_of_x_times_y = sum_of_x_times_y + (x*y);
+      }
+
+    }
+
+    void load_data()
+    {
+      /*
+      This function reads numerical data from a csv file
+      wherein each line of the file corresponds to data,
+      it ends reading when invalid input is encountered
+      */
+      ifstream target_file;
+
+      target_file.open(file_adress);
+      bool end_of_data = false;
+      string buffer;
+
+      string *points = new string[2]; 
+      
+      while(target_file.eof() == false && end_of_data == false)
+      {
+        getline(target_file, buffer);
+        buffer.erase(buffer.find_last_not_of(" \t\n\r\f\v") + 1);
+        stringstream data_stream(buffer);
+        string raw_string_data;
+
+        string *points = new string[2];
+
+        int number_of_strings = 0;
+        while (data_stream.eof() == false)
+        {
+          data_stream >> raw_string_data;
+          number_of_strings++;
+        }
+
+        if (number_of_strings != 2)
+        {
+          end_of_data = true;
+        }
+        else
+        {
+          int i = 0;
+          double values[2];
+          stringstream data_stream_to_process(buffer);
+          while (data_stream_to_process >> points[i])
+          {
+
+            try
+            {
+              values[i] = stod(points[i]);
+            }
+            catch(const std::exception& e)
+            {
+              end_of_data = true;
+              break;
+            }
+
+            i++;
+          } 
+          if(end_of_data == false)
+          { 
+            X_coordinates.push_back(values[0]);
+            Y_coordinates.push_back(values[1]);    
+          }
+        }
+      }
+    }
   
   public:
-    vector<vector<double>> XY_points;
-
-    Data(string target)
+    LineFit(string target)
     {
       file_adress = target;
+      load_data();
+      ComputeSums();
+      ComputeSlope();
+      ComputeIntercept();
+    }
+
+    double GetIntercept()
+    {
+      return Y_intercept;
+    }
+
+    double GetSlope()
+    {
+      return slope;
     }
  
 };
@@ -31,51 +157,13 @@ class Data
 
 int main ()
 {
-  /*
-  This function reads numerical data from a csv file
-  wherein each line of the file
-  */
+  LineFit data("test.csv");
 
-  ifstream target_file;
-
-  target_file.open("test.csv");
-  bool end_of_data = false;
-  string buffer;
-
-  string *points = new string[2]; 
-  
-  while(target_file.eof() == false && end_of_data == false)
-  {
-    getline(target_file, buffer);
-    stringstream data_stream(buffer);
-    string raw_string_data;
-
-    string *points = new string[2];
-
-    int number_of_strings = 0;
-    while (data_stream.eof() == false)
-    {
-      data_stream >> raw_string_data;
-      number_of_strings++;
-    }
-
-    if (number_of_strings > 2)
-    {
-      end_of_data = true;
-    }
-    else
-    {
-      int i = 0;
-      stringstream data_stream_to_process(buffer);
-      while (data_stream_to_process >> points[i])
-      {
-        cout << points[i] << endl;
-        i++;
-      }
-      
-    }
-
-  }
+  cout << setprecision(7);
+  cout << "Slope: "<< data.GetSlope() << endl;
+  cout << "Intercept: "<<data.GetIntercept() << endl;
 
   return 0;
 }
+
+
