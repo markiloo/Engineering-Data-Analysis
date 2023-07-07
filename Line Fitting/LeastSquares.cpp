@@ -4,6 +4,7 @@
 #include <vector>
 #include <sstream>
 #include <iomanip>
+#include <string>
 
 /*
   LeastSquares line fit calculator
@@ -154,10 +155,25 @@ class LineFit
  
 };
 
+bool isFileReal(string address);
 
 int main ()
 {
-  LineFit data("test.csv");
+  string target_address;
+
+  cout << "Enter Address of file: ";
+  getline(cin, target_address);
+
+  while (isFileReal(target_address) == false || target_address.length() < 1)
+  {
+    cout << "Address doesn't exist please check your input." << endl;
+    cout << "Remember to include the file extension." << endl;
+    cout << "Here's what you entered: " << target_address << endl;
+    cout << "Enter Address of file: ";
+    getline(cin, target_address);
+  }
+
+  LineFit data(target_address);
 
   cout << setprecision(7);
   cout << "Slope: "<< data.GetSlope() << endl;
@@ -166,4 +182,20 @@ int main ()
   return 0;
 }
 
+bool isFileReal(string address)
+{
+  ifstream file;
+  address.erase(address.find_last_not_of(" \t\n\r\f\v") + 1);
+  file.open(address);
 
+  if(file)
+  {
+    return true;
+  }
+  else
+  {
+    return false;
+  }
+
+
+}
