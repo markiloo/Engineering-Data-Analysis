@@ -96,9 +96,9 @@ void GenerateData(int totalOcurr,
                   double cumulativeFrequency, 
                   vector<Cluster> &arg_dataClusters);
 
-int generateDecimal(double min, 
-                    double max, 
-                    default_random_engine &arg_generator);
+double generateNumber(double min, 
+                      double max, 
+                      default_random_engine &arg_generator);
 
 int main()
 {
@@ -210,7 +210,7 @@ double GenerateGaussianRand(default_random_engine &arg_generator)
 }
 
 //function to generate a random number
-int generateNumber(double min, double max, 
+double generateNumber(double min, double max, 
                   default_random_engine &arg_generator) 
 {
   uniform_real_distribution<double> distribution(min, max);
@@ -305,7 +305,7 @@ void GenerateData(int totalOcurr,
   while(occurencesGenerated < totalOcurr)
   {
     double totalFreq = 0;
-    int randomNumber = generateNumber(0, cumulativeFrequency, generator);
+    double randomNumber = generateNumber(0, cumulativeFrequency, generator);
 
     for(int i = 0; i < arg_dataClusters.size(); i++)
     {
@@ -320,7 +320,7 @@ void GenerateData(int totalOcurr,
         occurencesGenerated = occurencesGenerated + 1;
         break;
       }
-      totalFreq += arg_dataClusters[i].GetRelativeFrequency();
+      totalFreq = totalFreq + arg_dataClusters[i].GetRelativeFrequency();
     }
   }
 
@@ -345,7 +345,7 @@ void PlayGame(default_random_engine &generator,
   {
     double totalFreq = 0;
     char generatedType;
-    int randomNumber = generateNumber(0, cumulativeFrequency, generator);
+    double randomNumber = generateNumber(0, cumulativeFrequency, generator);
     char choiceBound = arg_dataClusters[arg_dataClusters.size() - 1].getName();
 
     for(int i = 0; i < arg_dataClusters.size(); i++)

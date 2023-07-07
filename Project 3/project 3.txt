@@ -1,0 +1,15 @@
+
+Project 3 - Linefit
+
+Specs:
+  Make program that finds the best fit using least squares method. 
+
+*Imports x-y data from a file
+*Use formula from walpole
+  -> Y-intercept
+  -> Slope
+
+Note: Make the program space and time efficient
+  -> Create a class
+  
+Note: Use atandard arithmetic operators (+, -, *, /)
