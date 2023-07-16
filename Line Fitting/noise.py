@@ -12,8 +12,8 @@ intercept = 3
 
 f = open("test2.csv", "w")
 
-for i in range(5, 50 + 1):
+for i in range(5, 1000000 + 1):
     y_value = slope*i + intercept
-    y_value = y_value + numpy.random.normal(0, 25)
+    y_value = y_value + numpy.random.normal(0, 5)
   
     f.write(f"{i} \t {y_value}\n")
